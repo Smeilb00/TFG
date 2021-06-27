@@ -19,7 +19,6 @@ rutaInput = ""
 rutaDatapool = base + "/../Datapool/"
 rutaOutput = base + "/../Output/"
 dirConfig = base + "/../Config/"
-acerto = ""
 
 
 def ventanaTiempos(ts):
@@ -43,7 +42,7 @@ def ventanaTiempos(ts):
     tiempos.place(x=20, y=20)
 
 
-def ventanaAcierto(tiempos):
+def ventanaAcierto(tiempos, kern):
     root = Tk()
     root.title("Confirmación")
     root.geometry("200x100")
@@ -53,26 +52,32 @@ def ventanaAcierto(tiempos):
     labeltexto = Label(root, text="¿Ha acertado el programa?")
     labeltexto.place(x=29, y=20)
 
-    butYes = Button(root, text="SI", width=5, command=lambda :[siAcerto(), close(root), ventanaTiempos(tiempos)])
+    df = pandas.DataFrame({'Algoritmo utilizado': [kern],
+                           '¿Resultado Correcto?': "",
+                           'Tiempo para el reconocimiento:': [tiempos["t3"]]
+                           })
+
+    butYes = Button(root, text="SI", width=5, command=lambda :[siAcerto(df), close(root), ventanaTiempos(tiempos)])
     butYes.place(x=50, y=65)
 
-    butNo = Button(root, text="NO", width=5, command=lambda :[noAcerto(), close(root), ventanaTiempos(tiempos)])
+    butNo = Button(root, text="NO", width=5, command=lambda :[noAcerto(df), close(root), ventanaTiempos(tiempos)])
     butNo.place(x=110, y=65)
 
     root.protocol("WM_DELETE_WINDOW", disable_event)
 
+
+
     root.mainloop()
 
 
-def siAcerto():
-    global acerto
-    acerto = "si"
+def siAcerto(df):
+    df['¿Resultado Correcto?'] = "si"
+    createOutput.run(df, "def")
 
 
-def noAcerto():
-    global acerto
-    acerto = "no"
-
+def noAcerto(df):
+    df['¿Resultado Correcto?'] = "no"
+    createOutput.run(df, "def")
 
 def disable_event():
     pass
@@ -150,12 +155,8 @@ def start(kernel):
                 alertBoxErrors(4)
             else:
                 tiempos["t4"] = datetime.datetime.now().strftime("%H:%M:%S")
-                ventanaAcierto(tiempos)
-                df = pandas.DataFrame({'Algoritmo utilizado': [kern],
-                                       '¿Resultado Correcto?': [acerto],
-                                       'Tiempo para el reconocimiento:': [tfinal]
-                                       })
-                createOutput.run(df, "def")
+                ventanaAcierto(tiempos, kern)
+
 
 
 def alertBoxAyuda():
@@ -346,19 +347,22 @@ def startComplex(kernel, numejecs, resultExpect, outName, root):
                 if resultExpect not in outRecon:
                     todos = False
 
-            if todos:
-                siAcerto()
-            else:
-                noAcerto()
+
 
         if tfinal == -1:
             alertBoxErrors(4)
         else:
             df = pandas.DataFrame({'Algoritmo utilizado': [kern],
-                                   '¿Resultado Correcto?': [acerto],
+                                   '¿Resultado Correcto?': acerto,
                                    'Tiempo para el reconocimiento:': [tfinal]
                                    })
-            createOutput.run(df, "../Output/" + outName)
+            if acerto != "unknown":
+                if todos:
+                    siAcerto(df)
+                else:
+                    noAcerto(df)
+
+            createOutput.run(df, rutaOutput + outName)
             contador -= 1
     close(root)
 

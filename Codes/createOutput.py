@@ -2,8 +2,8 @@ import openpyxl
 import openpyxl.worksheet.dimensions
 import pandas as pd
 import os.path
-
-rutaOutput = '../Output/Output.xlsx'
+import os
+rutaOutput = os.getcwd() + '/../Output/Output.xlsx'
 
 def run(insert, nameOut):
     if nameOut != "def":
