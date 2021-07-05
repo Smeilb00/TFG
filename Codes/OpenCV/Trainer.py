@@ -10,7 +10,7 @@ def run(emb, recon, inputle, kernel):
     labels = le.fit_transform(data["nombres"])
 
     # Ahora entrenemos el modelo usando los embeddings para crear el sistema de reconocimiento
-    recognizer = SVC(C=100, kernel=kernel, probability=True, gamma=1)
+    recognizer = SVC(C=100, kernel=kernel, probability=True, gamma='scale')
     recognizer.fit(data["embeddings"], labels)
 
     # Guardamos el sistema entrenado

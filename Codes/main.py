@@ -9,7 +9,7 @@ import createOutput
 
 # Importamos las clases desde los paquetes correspondientes
 
-from Face_Recognition import face_recognition_final
+from Face_Recognition import Face_Recognition_Final
 from OpenCV import AnalizeDatapool
 from OpenCV import Recognize
 from OpenCV import Trainer
@@ -127,7 +127,7 @@ def start(kernel):
                     "Datapool": rutaDatapool,
                     "Config": dirConfig
                 }
-                outRecon = face_recognition_final.run(data, 0)
+                outRecon = Face_Recognition_Final.run(data, 0)
                 tfinal = float(outRecon[len(outRecon)-1])
                 tiempos["t2"] = 0.0
                 tiempos["t3"] = tfinal
@@ -329,7 +329,7 @@ def startComplex(kernel, numejecs, resultExpect, outName, root):
                 "Config": dirConfig
             }
 
-            outRecon = face_recognition_final.run(data, 1)
+            outRecon = Face_Recognition_Final.run(data, 1)
 
         tfinal = float(outRecon[len(outRecon) - 1])
         todos = True
@@ -337,6 +337,7 @@ def startComplex(kernel, numejecs, resultExpect, outName, root):
             resultExpect = "unknown"
             acerto = "unknown"
         else:
+            acerto = ""
             if str(resultExpect).find(', ') != -1:
                 names = resultExpect.split(", ")
                 for name in names:
@@ -352,6 +353,12 @@ def startComplex(kernel, numejecs, resultExpect, outName, root):
         if tfinal == -1:
             alertBoxErrors(4)
         else:
+            if acerto != "unknown":
+                if todos:
+                    acerto = "si"
+                else:
+                    acerto = "no"
+
             df = pandas.DataFrame({'Algoritmo utilizado': [kern],
                                    '¿Resultado Correcto?': acerto,
                                    'Tiempo para el reconocimiento:': [tfinal]
